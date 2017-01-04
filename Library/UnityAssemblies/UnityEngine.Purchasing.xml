@@ -734,6 +734,11 @@
         <para>The various reasons a purchase can fail.</para>
       </summary>
     </member>
+    <member name="F:UnityEngine.Purchasing.PurchaseFailureReason.DuplicateTransaction">
+      <summary>
+        <para>A duplicate transaction error when the transaction has already been completed successfully.</para>
+      </summary>
+    </member>
     <member name="F:UnityEngine.Purchasing.PurchaseFailureReason.ExistingPurchasePending">
       <summary>
         <para>A purchase was already in progress when a new purchase was requested.</para>

@@ -1,10 +1,10 @@
 ﻿Shader "Custom/GlowOutline" {
 	Properties {
-		_Color ("Color", Color) = (1,1,1,1)
+		_Color ("Color", Color) = (1,1,1,0.5)
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_BumpMap("Normal Map", 2D) = "bump"{}
-		_RimColor("Rim Color", Color) = (1,1,1,1)
-		_RimPower("Rim Strength", Range(0.0,5.0)) = 2.5
+		_RimColor("Rim Color", Color) = (1,1,1,0)
+		_RimPower("Rim Strength", Range(0.0,5.0)) = 5
 	}
 	SubShader {
 		Tags { "RenderType"="Opaque" }

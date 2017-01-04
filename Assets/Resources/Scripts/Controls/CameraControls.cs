@@ -12,10 +12,12 @@ public class CameraControls : MonoBehaviour {
     public  Vector3 MoveDir;
     private float Zoom = 5;
 
-    private Transform VisionLight;
+    private Transform CameraTransform;
+
 
     void Start()
     {
+        CameraTransform = transform.GetChild(0);
         transform.position = new Vector3(0,Zoom,0);
     }
 

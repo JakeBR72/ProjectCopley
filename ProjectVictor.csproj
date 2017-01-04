@@ -52,6 +52,9 @@
     <Reference Include="UnityEngine">
       <HintPath>Library\UnityAssemblies\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Advertisements">
+      <HintPath>Library\UnityAssemblies\UnityEngine.Advertisements.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
@@ -67,6 +70,9 @@
     <Reference Include="UnityEngine.HoloLens">
       <HintPath>Library\UnityAssemblies\UnityEngine.HoloLens.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Purchasing">
+      <HintPath>Library\UnityAssemblies\UnityEngine.Purchasing.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.VR">
       <HintPath>Library\UnityAssemblies\UnityEngine.VR.dll</HintPath>
     </Reference>
@@ -81,9 +87,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Resources\Scripts\CameraControls.cs" />
-    <Compile Include="Assets\Resources\Scripts\Grid.cs" />
-    <Compile Include="Assets\Resources\Scripts\MouseControls.cs" />
+    <Compile Include="Assets\Resources\Scripts\Controls\CameraControls.cs" />
+    <Compile Include="Assets\Resources\Scripts\Controls\KeyboardControls.cs" />
+    <Compile Include="Assets\Resources\Scripts\Controls\MouseControls.cs" />
+    <Compile Include="Assets\Resources\Scripts\Map\Grid.cs" />
+    <Compile Include="Assets\Resources\Scripts\Map\Tile.cs" />
+    <Compile Include="Assets\Resources\Scripts\Menus\Build\BuildScript.cs" />
+    <Compile Include="Assets\Resources\Scripts\Static\TileTypes.cs" />
+    <Compile Include="Assets\Resources\Scripts\UI\InteractCanvas.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\MenuManager.cs" />
   </ItemGroup>
   <ItemGroup>
