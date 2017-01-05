@@ -8,6 +8,8 @@ public class MenuManager : MonoBehaviour {
     public RectTransform LastMenu;
     public GameObject returnObj;
 
+    public bool MenusClosed;
+
     public int MoveSpeed = 5;
 
     public List<GameObject> CanvasList = new List<GameObject>();
@@ -35,6 +37,7 @@ public class MenuManager : MonoBehaviour {
 
     public void OpenMenu(string menuName)
     {
+        MenusClosed = false;
         returnObj = null;
         LastMenu = CurrentMenu;
         foreach(GameObject obj in CanvasList)
@@ -55,11 +58,13 @@ public class MenuManager : MonoBehaviour {
     }
     public void CloseMenu()
     {
+        MenusClosed = true;
         LastMenu = CurrentMenu;
     }
     public void ResetMenus()
     {
-        foreach(GameObject obj in CanvasList)
+        MenusClosed = true;
+        foreach (GameObject obj in CanvasList)
         {
             obj.GetComponent<RectTransform>().anchoredPosition = new Vector2(obj.GetComponent<RectTransform>().rect.width, 0);
         }

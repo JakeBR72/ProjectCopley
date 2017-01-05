@@ -6,11 +6,10 @@ public class MouseControls : MonoBehaviour {
     public Vector3 MousePos;
     public GameObject CurrentTarget;
     private Transform LastTransform;
+    private Shader LastShader;
     private MenuManager UI;
     private InteractCanvas InteractCanvas;
-
     public bool enabled = true;
-
 	void Start () {
         UI = GameObject.Find("_UI").GetComponent<MenuManager>();
 	}	
@@ -22,50 +21,36 @@ public class MouseControls : MonoBehaviour {
             Ray ray;
             RaycastHit rayHit;
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            if (!UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() && (Input.GetMouseButtonDown(0)))
             {
                 if (Physics.Raycast(ray, out rayHit) && rayHit.collider.transform.tag == "Interactable")
                 {
-                    if (rayHit.transform != LastTransform && LastTransform != null)
+                    if(LastTransform != null && LastTransform != rayHit.collider.transform)
                     {
-                        LastTransform.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
+                        ResetTile();
                     }
                     LastTransform = rayHit.collider.transform;
+                    LastShader = LastTransform.GetComponent<Renderer>().material.shader;
                     CurrentTarget = LastTransform.gameObject;
                     MousePos = rayHit.point;
                     MousePos = new Vector3(Mathf.Round(MousePos.x), Mathf.Round(MousePos.y), Mathf.Round(MousePos.z));
                     MousePos += new Vector3(0.5f, 0, 0.5f);
-                    LastTransform.GetComponent<Renderer>().material.shader = Shader.Find("Custom/GlowOutline");
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        Tile CurrentTile = rayHit.collider.gameObject.GetComponentInChildren<Tile>();
-                        UI.OpenMenu("Interact");
-                        InteractCanvas = UI.returnObj.GetComponent<InteractCanvas>();
-                        InteractCanvas.SetTitle(CurrentTile.Type);
-                    }
+                    //Set Highlight Color
+                    LastTransform.GetComponent<Renderer>().material.SetColor("_Emission",new Color(1,1,1,0.25f));
+                    Tile CurrentTile = rayHit.collider.gameObject.GetComponentInChildren<Tile>();
+                    UI.OpenMenu("Interact");
+                    InteractCanvas = UI.returnObj.GetComponent<InteractCanvas>();
+                    InteractCanvas.SetTitle(CurrentTile.Type);
                 }
-                else
-                {
-                    if (LastTransform != null)
-                    {
-                        LastTransform.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
-                        MousePos = new Vector3(0, -10000, 0);
-                    }
-                }
-            }
-            else
+            }else if (UI.MenusClosed && LastTransform != null)
             {
-                if (LastTransform != null)
-                {
-                    LastTransform.GetComponent<Renderer>().material.shader = Shader.Find("Standard");
-                    MousePos = new Vector3(0, -10000, 0);
-                }
+                ResetTile();
             }
         }
     }
 
-    public Vector3 GetMousePos()
+    void ResetTile()
     {
-        return MousePos;
+        LastTransform.GetComponent<Renderer>().material.SetColor("_Emission", new Color(0, 0, 0, 0));
     }
 }
