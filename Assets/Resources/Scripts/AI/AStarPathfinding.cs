@@ -3,121 +3,175 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AStarPathfinding : MonoBehaviour {
+    public Vector3 StartPos;
+    public Vector3 EndPos;
+    private Vector3 OldEndPos;
+    private Vector3 OldStartPos;
+    AStarTile CurrentTile;
 
-    public Vector3 CurrentPosition;
-    public Vector3 TargetPosition;
-    public bool TargetPositionAdded;
-    public bool PathFound;
-    public AStarTile CurrentTile;
+    public bool HasPath = false;
+    public int StepInPath;
+    public bool PathAvailable = true;
+    public bool Done = false;
 
     public List<AStarTile> Open = new List<AStarTile>();
     public List<AStarTile> Closed = new List<AStarTile>();
-
     public List<AStarTile> Path = new List<AStarTile>();
 
     private Grid Grid;
 
-    void Start () {
+    private void Start()
+    {
         Grid = GameObject.Find("_Initializer").GetComponent<Grid>();
-        CurrentPosition = new Vector3(transform.position.x, 0, transform.position.z);
-        CurrentTile = new AStarTile((int)CurrentPosition.x, (int)CurrentPosition.z,0,
-            (int)(Mathf.Abs(TargetPosition.x-CurrentPosition.x)*10 + Mathf.Abs(TargetPosition.z - CurrentPosition.z) * 10),
-            null);
-        AddToClosed(CurrentTile);
+        Grid.PathFinders.Add(this);
+        StartPos = new Vector3((int)transform.position.x, 1, (int)transform.position.z);
+        CurrentTile = new AStarTile(StartPos, StartPos, EndPos,null);
+        Closed.Add(CurrentTile);
+        OldEndPos = EndPos;
+        OldStartPos = StartPos;
     }
-	
-	void Update () {
-        if (!PathFound)
-        {
-            Path.Clear();
-            while (!TargetPositionAdded)
-            {
-                //Add Adjacent tiles (check if its target position, if so set TargetPositionAdded to true
-                int rightI = CurrentTile.X + 1;
-                AStarTile newTile;
-                if (rightI < Grid.MapSize - 1 && Grid.ObjectLayer[rightI, CurrentTile.Z] == null)
-                {
-                    newTile = new AStarTile(rightI, CurrentTile.Z, CurrentTile.G + 10,
-                                        (((int)TargetPosition.x - rightI) * 10) + (((int)TargetPosition.z - CurrentTile.Z) * 10),
-                                        CurrentTile);
-                    AddToOpen(newTile);
-                }
-                int leftI = CurrentTile.X - 1;
-                if (leftI > 1 && Grid.ObjectLayer[leftI, CurrentTile.Z] == null)
-                {
-                    newTile = new AStarTile(leftI, CurrentTile.Z, CurrentTile.G + 10,
-                                        (((int)TargetPosition.x - leftI) * 10) + (((int)TargetPosition.z - CurrentTile.Z) * 10),
-                                        CurrentTile);
-                    AddToOpen(newTile);
-                }
-                int forwardI = CurrentTile.Z + 1;
-                if (forwardI < Grid.MapSize - 1 && Grid.ObjectLayer[CurrentTile.X, forwardI] == null)
-                {
-                    newTile = new AStarTile(CurrentTile.X, forwardI, CurrentTile.G + 10,
-                                        (((int)TargetPosition.x - CurrentTile.X) * 10) + (((int)TargetPosition.z - forwardI) * 10),
-                                        CurrentTile);
-                    AddToOpen(newTile);
-                }
-                int backwardI = CurrentTile.Z - 1;
-                if (backwardI > 1 && Grid.ObjectLayer[CurrentTile.X, backwardI] == null)
-                {
-                    newTile = new AStarTile(CurrentTile.X, backwardI, CurrentTile.G + 10,
-                                        (((int)TargetPosition.x - CurrentTile.X) * 10) + (((int)TargetPosition.z - backwardI) * 10),
-                                        CurrentTile);
-                    AddToOpen(newTile);
-                }
 
-                int lowestF = int.MaxValue;
-                foreach (AStarTile tile in Open)
-                {
-                    if (tile.X == TargetPosition.x && tile.Z == TargetPosition.z)
-                    {
-                        TargetPositionAdded = true;
-                        AddToClosed(Open[Open.Count - 1]);
-                        Open.Clear();
-                        return;
-                    }
-                    if (tile.F < lowestF)
-                    {
-                        CurrentTile = tile;
-                        lowestF = tile.F;
-                    }
-                }
-                AddToClosed(CurrentTile);
-                Open.Remove(CurrentTile);
-            }
-            //Setu Path
-            CurrentTile = Closed[Closed.Count - 1];
-            Path.Add(CurrentTile);
-            while (CurrentTile.Parent != null)
+    private void Update()
+    {
+        if (!Done)
+        {
+            if (HasPath)
             {
-                CurrentTile = CurrentTile.Parent;
-                Path.Add(CurrentTile);
+                Navigate();
             }
-            PathFind();
+            else if (PathAvailable)
+            {
+                SearchForPath();
+            }
+        }else
+        {            
+            if(OldEndPos != EndPos)
+            {
+                OldEndPos = EndPos;
+                ForceRecheck();
+            }
         }
     }
-    void PathFind()
+
+    void Navigate()
     {
+        if(Mathf.Abs(Vector3.Distance(Path[StepInPath].Pos,transform.position)) > 0.25f )
+        {
+            MoveToNextNode();
+        }
+        else
+        {
+            if(StepInPath < Path.Count-1) {
+                //PathFindColor
+                Grid.FloorLayer[Path[StepInPath].X,Path[StepInPath].Z].GetComponentInChildren<Renderer>().material.color = new Color(1, 1, 1, 1f);
+
+                StepInPath++;
+            }else
+            {
+                if (transform.position != EndPos)
+                {
+                    MoveToNextNode();
+                }else
+                {
+                    //PathFindColor
+                    Grid.FloorLayer[Path[StepInPath].X, Path[StepInPath].Z].GetComponentInChildren<Renderer>().material.color = new Color(1, 1, 1, 1f);
+                    Done = true;
+                    EndPos = OldStartPos;
+                    StartPos = OldEndPos;
+                }
+            }
+        }
+    }
+    void MoveToNextNode()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, Path[StepInPath].Pos, Time.deltaTime);
+    }
+    void SearchForPath()
+    {
+        AStarTile LowestFTile = CurrentTile;
+        int LowestF = int.MaxValue;
+        if(CurrentTile.X - 1 >= 1 && Grid.ObjectLayer[CurrentTile.X - 1,CurrentTile.Z] == null)
+        {
+            AddToOpen(  new AStarTile(CurrentTile.Pos + new Vector3(-1, 0, 0), StartPos, EndPos, CurrentTile)  );            
+        }
+        if (CurrentTile.X + 1 < Grid.MapSize-1 && Grid.ObjectLayer[CurrentTile.X + 1, CurrentTile.Z] == null)
+        {
+            AddToOpen(new AStarTile(CurrentTile.Pos + new Vector3(1, 0, 0), StartPos, EndPos, CurrentTile));
+        }
+        if (CurrentTile.Z - 1 >= 1 && Grid.ObjectLayer[CurrentTile.X , CurrentTile.Z - 1] == null)
+        {
+            AddToOpen(new AStarTile(CurrentTile.Pos + new Vector3(0, 0, -1), StartPos, EndPos, CurrentTile));
+        }
+        if (CurrentTile.Z + 1 < Grid.MapSize-1 && Grid.ObjectLayer[CurrentTile.X, CurrentTile.Z + 1] == null)
+        {
+            AddToOpen(new AStarTile(CurrentTile.Pos + new Vector3(0, 0, 1), StartPos, EndPos, CurrentTile));
+        }
+        foreach(AStarTile tile in Open)
+        {
+            if(tile.F < LowestF)
+            {
+                LowestF = tile.F;
+                LowestFTile = tile;
+            }
+        }
+        if(CurrentTile == LowestFTile)
+        {
+            PathAvailable = false;
+        }
+        CurrentTile = LowestFTile;
+        Open.Remove(CurrentTile);
+        Closed.Add(CurrentTile);
+        if(CurrentTile.Pos == EndPos)
+        {
+            HasPath = true;
+            while(CurrentTile.Parent != null)
+            {
+                Path.Add(CurrentTile);
+                CurrentTile = CurrentTile.Parent;
+            }            
+            Path.Reverse();
+            foreach(AStarTile tile in Path)
+            {
+                Grid.FloorLayer[tile.X,tile.Z].GetComponentInChildren<Renderer>().material.color = new Color(1, 0, 0, 1f);
+            }
+        }
+    }
+
+    void AddToOpen(AStarTile Tile)
+    {
+        foreach(AStarTile tile in Open)
+        {
+            if(Tile.Pos == tile.Pos)
+            {
+                return;
+            }
+        }
+        foreach (AStarTile tile in Closed)
+        {
+            if (Tile.Pos == tile.Pos)
+            {
+                return;
+
+            }
+        }
+        Open.Add(Tile);
+    }
+
+    public void ForceRecheck()
+    {
+        Done = false;
+        HasPath = false;
+        PathAvailable = true;
+        StepInPath = 0;
+        Open = new List< AStarTile > ();
+        Closed = new List<AStarTile>();
         foreach (AStarTile tile in Path)
         {
-            Debug.Log(tile.X + " " + tile.Z);
+            Grid.FloorLayer[tile.X, tile.Z].GetComponentInChildren<Renderer>().material.color = new Color(1, 1, 1, 1f);
         }
-        PathFound = true;
-        Open.Clear();
-        Closed.Clear();
-    }
-    void AddToOpen(AStarTile tile)
-    {
-        if(!Open.Contains(tile) && !Closed.Contains(tile)){
-            Open.Add(tile);
-        }
-    }
-    void AddToClosed(AStarTile tile)
-    {
-        if (!Closed.Contains(tile))
-        {
-            Closed.Add(tile);
-        }
+        Path = new List<AStarTile>();        
+        StartPos = new Vector3((int)transform.position.x, 1, (int)transform.position.z);
+        CurrentTile = new AStarTile(StartPos, StartPos, EndPos, null);
+        Closed.Add(CurrentTile);
     }
 }

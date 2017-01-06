@@ -6,10 +6,11 @@ public class Grid : MonoBehaviour {
     public GameObject Floor;
     public GameObject Wall;
     
-    public static int MapSize = 5;
+    public static int MapSize = 10;
     public GameObject[,] FloorLayer = new GameObject[MapSize,MapSize];
     public GameObject[,] ObjectLayer = new GameObject[MapSize,MapSize];
 
+    public List<AStarPathfinding> PathFinders = new List<AStarPathfinding>();
 
     void Start () {
         
@@ -33,4 +34,12 @@ public class Grid : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    public void ForceUpdate()
+    {
+        foreach (AStarPathfinding unit in PathFinders)
+        {
+            unit.ForceRecheck();
+        }
+    }
 }
