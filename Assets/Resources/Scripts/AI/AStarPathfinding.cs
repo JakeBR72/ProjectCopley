@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Diagnostics;
+using System;
 
 public class AStarPathfinding : MonoBehaviour {
     public Vector3 StartPos;
@@ -17,7 +19,7 @@ public class AStarPathfinding : MonoBehaviour {
     public List<AStarTile> Open = new List<AStarTile>();
     public List<AStarTile> Closed = new List<AStarTile>();
     public List<AStarTile> Path = new List<AStarTile>();
-
+    
     private Grid Grid;
 
     private void Start()
@@ -63,7 +65,7 @@ public class AStarPathfinding : MonoBehaviour {
         {
             if(StepInPath < Path.Count-1) {
                 //PathFindColor
-                Grid.FloorLayer[Path[StepInPath].X,Path[StepInPath].Z].GetComponentInChildren<Renderer>().material.color = new Color(1, 1, 1, 1f);
+               Grid.FloorLayer[Path[StepInPath].X,Path[StepInPath].Z].GetComponentInChildren<Renderer>().material.color = new Color(1, 1, 1, 1f);
 
                 StepInPath++;
             }else
@@ -76,15 +78,21 @@ public class AStarPathfinding : MonoBehaviour {
                     //PathFindColor
                     Grid.FloorLayer[Path[StepInPath].X, Path[StepInPath].Z].GetComponentInChildren<Renderer>().material.color = new Color(1, 1, 1, 1f);
                     Done = true;
-                    EndPos = OldStartPos;
-                    StartPos = OldEndPos;
+                    if (EndPos != OldStartPos)
+                    {
+                        EndPos = OldStartPos;
+                    }else
+                    {
+                        EndPos = OldEndPos;
+                    }
+                    ForceRecheck();
                 }
             }
         }
     }
     void MoveToNextNode()
     {
-        transform.position = Vector3.MoveTowards(transform.position, Path[StepInPath].Pos, Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, Path[StepInPath].Pos,5* Time.deltaTime);
     }
     void SearchForPath()
     {
@@ -124,7 +132,7 @@ public class AStarPathfinding : MonoBehaviour {
         if(CurrentTile.Pos == EndPos)
         {
             HasPath = true;
-            while(CurrentTile.Parent != null)
+            while (CurrentTile.Parent != null)
             {
                 Path.Add(CurrentTile);
                 CurrentTile = CurrentTile.Parent;
@@ -169,9 +177,11 @@ public class AStarPathfinding : MonoBehaviour {
         {
             Grid.FloorLayer[tile.X, tile.Z].GetComponentInChildren<Renderer>().material.color = new Color(1, 1, 1, 1f);
         }
-        Path = new List<AStarTile>();        
+        Path = new List<AStarTile>();
+        Vector3 temp = StartPos;
         StartPos = new Vector3((int)transform.position.x, 1, (int)transform.position.z);
         CurrentTile = new AStarTile(StartPos, StartPos, EndPos, null);
+        StartPos = temp;
         Closed.Add(CurrentTile);
     }
 }

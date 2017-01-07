@@ -6,7 +6,7 @@ public class Grid : MonoBehaviour {
     public GameObject Floor;
     public GameObject Wall;
     
-    public static int MapSize = 10;
+    public static int MapSize = 20;
     public GameObject[,] FloorLayer = new GameObject[MapSize,MapSize];
     public GameObject[,] ObjectLayer = new GameObject[MapSize,MapSize];
 

@@ -83,6 +83,8 @@
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\AI\AStarPathfinding.cs" />
     <Compile Include="Assets\Resources\Scripts\AI\AStarTile.cs" />
+    <Compile Include="Assets\Resources\Scripts\AI\JPSNode.cs" />
+    <Compile Include="Assets\Resources\Scripts\AI\JumpPointSearch.cs" />
     <Compile Include="Assets\Resources\Scripts\Controls\CameraControls.cs" />
     <Compile Include="Assets\Resources\Scripts\Controls\KeyboardControls.cs" />
     <Compile Include="Assets\Resources\Scripts\Controls\MouseControls.cs" />

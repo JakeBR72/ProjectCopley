@@ -114,6 +114,20 @@ public class BuildScript : MonoBehaviour {
                     CurrentObject = null;
                     Grid.ForceUpdate();
                 }
+            }else
+            {
+                if (CurrentObject != null)
+                {
+                    CurrentObject.GetComponent<Renderer>().material.SetColor("_Emission", new Color(0, 0, 0, 1));
+                    CurrentObject = null;
+                }
+            }
+        }else
+        {
+            if (CurrentObject != null)
+            {
+                CurrentObject.GetComponent<Renderer>().material.SetColor("_Emission", new Color(0, 0, 0, 1));
+                CurrentObject = null;
             }
         }
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -135,6 +149,10 @@ public class BuildScript : MonoBehaviour {
         Mode = 0;
         if (CurrentObject != null) { 
             CurrentObject.GetComponentInChildren<Renderer>().material.SetColor("_Emission", new Color(0, 0, 0, 1));            
+        }
+        if (CurrentObject != null)
+        {
+            Destroy(CurrentObject);
         }
         CurrentObject = null;
     }
