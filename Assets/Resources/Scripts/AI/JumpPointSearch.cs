@@ -9,6 +9,7 @@ public class JumpPointSearch : MonoBehaviour {
     public List<JPSNode> Open = new List<JPSNode>();
     public List<JPSNode> Closed = new List<JPSNode>();
     public List<JPSNode> Path = new List<JPSNode>();
+    private Vector3 StartPos;
     JPSNode newNode;
     JPSNode currNode;
     Vector3 currPos;
@@ -17,6 +18,8 @@ public class JumpPointSearch : MonoBehaviour {
     private void Start()
     {
         Grid = GameObject.Find("_Initializer").GetComponent<Grid>();
+        StartPos = transform.position;
+        Destination = new Vector3(Grid.MapSize-2,1,Grid.MapSize-2);
     }
     private void Update()
     {
@@ -36,7 +39,7 @@ public class JumpPointSearch : MonoBehaviour {
                 obj.GetComponentInChildren<Renderer>().material.SetColor("_Color", new Color(1, 1, 1, 1));
             }
         }
-        transform.position = new Vector3(4, 1, 4);
+        transform.position = StartPos;
         StepInPath = -1;
         HasPath = false;
         Open = new List<JPSNode>();

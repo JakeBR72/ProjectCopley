@@ -1,2 +1,6 @@
-Base path: C:/Program Files/Unity 5.6.0b1/Editor/Data
-Cmd: initializeCompiler
+Base path: D:/Programs/unity5.5/Editor/Data
+Cmd: getPlatforms
+Cmd: preprocess
+  insize=965 outsize=1467 ok=1
+Cmd: preprocess
+  insize=768 outsize=765 ok=1
