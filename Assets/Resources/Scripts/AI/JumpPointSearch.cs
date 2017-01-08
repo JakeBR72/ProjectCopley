@@ -159,7 +159,13 @@ public class JumpPointSearch : MonoBehaviour {
                 Vert(currNode, 1);
                 Diag(new Vector3(1, 0, 1));
                 Diag(new Vector3(-1, 0, 1));
-            }else
+            }
+            else if (Forced == 4)
+            {
+                Vert(currNode, 1);
+                Diag(new Vector3(1, 0, 1));
+            }
+            else
             {
                 Vert(currNode, 1);
             }
@@ -247,7 +253,13 @@ public class JumpPointSearch : MonoBehaviour {
                 Vert(currNode, -1);
                 Diag(new Vector3(1, 0, -1));
                 Diag(new Vector3(1, 0, -1));
-            }else
+            }
+            else if (Forced == 4)
+            {
+                Vert(currNode, 1);
+                Diag(new Vector3(1, 0, -1));
+            }
+            else
             {
                 Vert(currNode, -1);
             }
