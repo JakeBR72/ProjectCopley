@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class JumpPointSearch : MonoBehaviour {
+    public bool DebugMode;
     public int MovementSpeed = 5;
     public Vector3 Destination;
     public bool HasPath;
@@ -31,6 +32,7 @@ public class JumpPointSearch : MonoBehaviour {
     //INITIALIZE
     public void NewPath()
     {
+        if(DebugMode)
         foreach(GameObject obj in Grid.FloorLayer)
         {
             if (obj.transform.position.x >= 1 && obj.transform.position.x < Grid.MapSize - 1 &&
@@ -52,12 +54,14 @@ public class JumpPointSearch : MonoBehaviour {
         //Do first vert/horiz checks
         FindPath();
         //Path found or not, process colors/path segments
-        foreach (JPSNode node in Closed)
+        if (DebugMode)
+            foreach (JPSNode node in Closed)
         {
             Debug.Log(node.Direction + " " + node.forced + " " + node.pos);
             ColorFloor(node.pos, Color.cyan);
         }
-        foreach (JPSNode node in Open)
+        if (DebugMode)
+            foreach (JPSNode node in Open)
         {
             ColorFloor(node.pos, Color.red);
         }
@@ -73,7 +77,8 @@ public class JumpPointSearch : MonoBehaviour {
         {
             while (Start.parent != null)
             {
-                ColorFloor(Start.pos,Color.green);
+                if (DebugMode)
+                    ColorFloor(Start.pos,Color.green);
                 Path.Add(Start);
                 Start = Start.parent;
             }
@@ -83,9 +88,12 @@ public class JumpPointSearch : MonoBehaviour {
         {
             Debug.Log("NO PATH");
         }
-        foreach(JPSNode node in Path)
+        if (DebugMode)
         {
-            Debug.Log(node.pos);
+            foreach (JPSNode node in Path)
+            {
+                Debug.Log(node.pos);
+            }
         }
 
         StepInPath = 0;
@@ -138,194 +146,102 @@ public class JumpPointSearch : MonoBehaviour {
         }
     }
 
+    //Forced neighbor handling
     void Direct()
     {
-        int Direction = currNode.Direction;
+        int Direction = Mathf.Abs(currNode.Direction);
+        int sign = (int)Mathf.Sign(currNode.Direction);
         int Forced = currNode.forced;
-        if (Direction == 2)
+        Forced = (Forced == 5) ? 2 : Forced;
+        if (Forced == 1)
         {
-            if (Forced == 1)
+            if (Direction == 1)
             {
-                Vert(currNode, 1);
-                Diag(new Vector3(-1, 0, 1));
+                Horiz(currNode, sign);
+                Diag(new Vector3(sign, 0, 1));
             }
-            else if (Forced == 2)
+            else if (Direction == 2)
             {
-                Vert(currNode, 1);
-                Diag(new Vector3(1, 0, 1));
+                Vert(currNode, sign);
+                Diag(new Vector3(-1, 0, sign));
             }
-            else if (Forced == 3)
+            else if (Direction == 3)
             {
-                Vert(currNode, 1);
-                Diag(new Vector3(1, 0, 1));
-                Diag(new Vector3(-1, 0, 1));
+                Horiz(currNode, 1);
+                Vert(currNode, sign);
+                Diag(new Vector3(-1, 0, sign));
+                Diag(new Vector3(1, 0, sign));
             }
-            else if (Forced == 4)
+            else if (Direction == 4)
             {
-                Vert(currNode, 1);
-                Diag(new Vector3(1, 0, 1));
-            }
-            else
-            {
-                Vert(currNode, 1);
+                Horiz(currNode, -1);
+                Vert(currNode, sign);
+                Diag(new Vector3(-1, 0, sign));
+                Diag(new Vector3(1, 0, sign));
             }
         }
-        else if (Direction == 3)
+        else if (Forced == 2)
         {
+            if (Direction == 1)
+            {
+                Horiz(currNode, sign);
+                Diag(new Vector3(sign, 0, -1));
+            }
+            else if (Direction == 2)
+            {
+                Vert(currNode, sign);
+                Diag(new Vector3(1, 0, sign));
+            }
+            else if (Direction == 3)
+            {
+                Horiz(currNode, 1);
+                Vert(currNode, sign);
+                Diag(new Vector3(-1, 0, sign));
+                Diag(new Vector3(1, 0, sign));
+            }
+            else if (Direction == 4)
+            {
+                Horiz(currNode, -1);
+                Vert(currNode, sign);
+                Diag(new Vector3(-1, 0, sign));
+                Diag(new Vector3(1, 0, sign));
+            }
+        }
+        else if (Forced == 3)
+        {
+            if (Direction == 1)
+            {
+                Horiz(currNode, sign);
+                Diag(new Vector3(sign, 0, 1));
+                Diag(new Vector3(sign, 0, -1));
+            }
+            else if (Direction == 2)
+            {
+                Vert(currNode, sign);
+                Diag(new Vector3(1, 0, sign));
+                Diag(new Vector3(-1, 0, sign));
+            }
+        }
+        else
+        {
+            if (Direction == 1)
+            {
+                Horiz(currNode, sign);
+            }
+            else if (Direction == 2)
+            {
+                Vert(currNode, sign);
+            }
+            else if (Direction == 3)
+            {
+                Diag(new Vector3(1, 0, sign));
+            }
+            else if (Direction == 4)
+            {
+                Diag(new Vector3(-1, 0, sign));
+            }
+        }
 
-            if (Forced == 1)
-            {
-                Horiz(currNode, 1);
-                Vert(currNode, 1);
-                Diag(new Vector3(-1, 0, 1));
-                Diag(new Vector3(1, 0, 1));
-            }
-            else if (Forced == 2)
-            {
-                Vert(currNode, 1);
-                Horiz(currNode, 1);
-                Diag(new Vector3(1, 0, 1));
-                Diag(new Vector3(1, 0, -1));
-            }
-            else
-            {
-                Diag(new Vector3(1, 0, 1));
-            }
-        }
-        else if (Direction == 1)
-        {            
-            if (Forced == 1)
-            {
-                Horiz(currNode, 1);
-                Diag(new Vector3(1, 0, 1));
-            }
-            else if (Forced == 2)
-            {
-                Horiz(currNode, 1);
-                Diag(new Vector3(1, 0, -1));
-            }
-            else if (Forced == 3)
-            {
-                Horiz(currNode, 1);
-                Diag(new Vector3(1, 0, 1));
-                Diag(new Vector3(1, 0, -1));
-            }else
-            {
-                Horiz(currNode, 1);
-            }
-        }
-        else if (Direction == -3)
-        {
-            if(Forced == 1)
-            {
-                Horiz(currNode, 1);
-                Vert(currNode, -1);
-                Diag(new Vector3(-1, 0, -1));
-                Diag(new Vector3(1, 0, -1));
-            }
-            else if (Forced == 2)
-            {
-                Vert(currNode, -1);
-                Horiz(currNode, -1);
-                Diag(new Vector3(1, 0, -1));
-                Diag(new Vector3(1, 0, 1));
-            }
-            else
-            {
-                Diag(new Vector3(1, 0, -1));
-            }
-        }
-        else if (Direction == -2)
-        {
-            
-            if (Forced == 1)
-            {
-                Vert(currNode, -1);
-                Diag(new Vector3(-1, 0, -1));
-            }
-            else if (Forced == 2)
-            {
-                Vert(currNode, -1);
-                Diag(new Vector3(1, 0,-1));
-            }
-            else if (Forced == 3)
-            {
-                Vert(currNode, -1);
-                Diag(new Vector3(1, 0, -1));
-                Diag(new Vector3(1, 0, -1));
-            }
-            else if (Forced == 4)
-            {
-                Vert(currNode, 1);
-                Diag(new Vector3(1, 0, -1));
-            }
-            else
-            {
-                Vert(currNode, -1);
-            }
-        }
-        else if (Direction == -4)
-        {
-            if (Forced == 1)
-            {
-                Horiz(currNode, -1);
-                Vert(currNode, -1);
-                Diag(new Vector3(-1, 0, -1));
-                Diag(new Vector3(1, 0, -1));
-            }
-            else if (Forced == 2)
-            {
-                Vert(currNode, -1);
-                Diag(new Vector3(-1, 0, -1));
-                Diag(new Vector3(-1, 0, 1));
-            }
-            else
-            {
-                Diag(new Vector3(-1, 0, -1));
-            }
-        }
-        else if (Direction == -1)
-        {            
-            if (Forced == 1)
-            {
-                Horiz(currNode, -1);
-                Diag(new Vector3(-1, 0, 1));
-            }
-            else if (Forced == 2)
-            {
-                Horiz(currNode, -1);
-                Diag(new Vector3(-1, 0, -1));
-            }
-            else if (Forced == 3)
-            {
-                Horiz(currNode, -1);
-                Diag(new Vector3(-1, 0, 1));
-                Diag(new Vector3(-1, 0, -1));
-            }else
-            {
-                Horiz(currNode, -1);
-            }
-        }
-        else if (Direction == 4)
-        {
-            if (Forced == 1)
-            {
-                Horiz(currNode, -1);
-                Vert(currNode, 1);
-                Diag(new Vector3(-1, 0, 1));
-                Diag(new Vector3(1, 0, 1));
-            }
-            else if (Forced == 2)
-            {
-                Vert(currNode, 1);
-                Diag(new Vector3(1, 0, 1));
-                Diag(new Vector3(-1, 0, 1));
-            }
-            else
-            {
-                Diag(new Vector3(-1, 0, 1));
-            }
-        }
     }
     void Diag(Vector3 dir)
     {
@@ -417,7 +333,8 @@ public class JumpPointSearch : MonoBehaviour {
                     temp = AddToOpen(currPos, parent, dir*2);
                     if (temp != null)
                     {
-                        ColorFloor(currPos, Color.red);
+                        if (DebugMode)
+                            ColorFloor(currPos, Color.red);
                         FoundNode = true;
                         temp.forced += 1;
                     }
@@ -432,7 +349,8 @@ public class JumpPointSearch : MonoBehaviour {
                         temp = AddToOpen(currPos, parent, dir * 2);
                         if (temp != null)
                         {
-                            ColorFloor(currPos, Color.red);
+                            if (DebugMode)
+                                ColorFloor(currPos, Color.red);
                             FoundNode = true;
                             temp.forced += 2;
                         }
@@ -472,8 +390,8 @@ public class JumpPointSearch : MonoBehaviour {
                     temp = AddToOpen(currPos, parent, dir);
                     if (temp != null)
                     {
-
-                        ColorFloor(currPos, Color.red);
+                        if (DebugMode)
+                            ColorFloor(currPos, Color.red);
                         temp.forced += 1;
                         FoundNode = true;
                     }
@@ -489,7 +407,8 @@ public class JumpPointSearch : MonoBehaviour {
                         temp = AddToOpen(currPos, parent, dir);
                         if (temp != null)
                         {
-                            ColorFloor(currPos, Color.red);
+                            if (DebugMode)
+                                ColorFloor(currPos, Color.red);
                             FoundNode = true;
                             temp.forced += 2;
                         }

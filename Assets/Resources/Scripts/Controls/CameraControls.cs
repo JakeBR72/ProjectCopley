@@ -18,7 +18,12 @@ public class CameraControls : MonoBehaviour {
     void Start()
     {
         CameraTransform = transform.GetChild(0);
-        transform.position = new Vector3(0,Zoom,0);
+        //Angled
+        //transform.position = new Vector3(2, Zoom, 2);
+        //Vertical View
+        Zoom = 8;
+        transform.position = new Vector3(4,Zoom,4);
+        transform.localEulerAngles = new Vector3(45,0,0);
     }
 
     void Update()
