@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class JumpPointSearch : MonoBehaviour {
     public bool DebugMode;
     public int MovementSpeed = 5;
@@ -18,6 +19,7 @@ public class JumpPointSearch : MonoBehaviour {
     int StepInPath;
     private void Start()
     {
+        GameObject.Find("_Pathfinding Controller").GetComponent<PathfindingController>().Add(this);
         Grid = GameObject.Find("_Initializer").GetComponent<Grid>();
         StartPos = transform.position;
         Destination = new Vector3(Grid.MapSize-2,1,Grid.MapSize-2);
@@ -196,14 +198,14 @@ public class JumpPointSearch : MonoBehaviour {
             {
                 Horiz(currNode, 1);
                 Vert(currNode, sign);
-                Diag(new Vector3(-1, 0, sign));
+                Diag(new Vector3(1, 0, -sign));
                 Diag(new Vector3(1, 0, sign));
             }
             else if (Direction == 4)
             {
                 Horiz(currNode, -1);
                 Vert(currNode, sign);
-                Diag(new Vector3(-1, 0, sign));
+                Diag(new Vector3(1, 0, -sign));
                 Diag(new Vector3(1, 0, sign));
             }
         }
